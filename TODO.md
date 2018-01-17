@@ -1,4 +1,5 @@
 * documentation!!
+* Better tests
 * Template aggegator policy
 * Serialization
 * add predicated construction library

@@ -1,0 +1,77 @@
+language: cpp
+sudo: false
+os: linux
+
+notifications:
+  email:
+    on_success: change
+    on_failure: always
+git:
+  depth: 5
+
+addons:
+  apt:
+    sources: &apt_sources
+      - ubuntu-toolchain-r-test
+      - llvm-toolchain-trusty
+      - llvm-toolchain-trusty-4.0
+      - llvm-toolchain-trusty-5.0
+
+matrix:
+  include:
+    # GCC 5
+    - env: COMPILER=g++-5
+      compiler: gcc
+      addons: &gcc5
+        apt:
+          packages: ["g++-5", "valgrind"]
+          sources: *apt_sources
+
+    # Clang 4.0
+    - env: COMPILER=clang++-4.0 ADDITIONAL_CXX_FLAGS="-g -fno-omit-frame-pointer -fsanitize=address,undefined"
+      addons: &clang40
+        apt:
+          packages: ["clang-4.0", "valgrind", "g++-6"]
+          sources: *apt_sources
+
+    # Xcode 9.2 Clang
+    - env: COMPILER=clang++ ADDITIONAL_CXX_FLAGS="-g -fno-omit-frame-pointer -fsanitize=address,undefined"
+      osx_image: xcode9.2
+      os: osx
+
+  allow_failures:
+    # sanitize on Linux is broken on Travis CI, so allow this failure until it's resolved
+    - env: COMPILER=clang++-4.0 ADDITIONAL_CXX_FLAGS="-g -fno-omit-frame-pointer -fsanitize=address,undefined"
+
+install:
+  - |
+    if [[ "${TRAVIS_OS_NAME}" == "osx" ]]; then
+      brew update
+      # cmake
+      if brew list -1 | grep -q "^cmake\$"; then
+        brew outdated cmake || brew upgrade cmake
+      else
+        brew install cmake
+      fi
+    fi
+
+before_script:
+  - ${COMPILER} --version
+  - cmake --version
+
+script:
+  # sanitizer options
+  - export ASAN_OPTIONS=allow_addr2line=true:check_initialization_order=true:strict_init_order=true:strict_string_checks=true:detect_odr_violation=2:detect_stack_use_after_return=true:verbosity=0
+  - export LSAN_OPTIONS=suppressions=../tools/lsan.supp
+  # build tests in debug and release and run them
+  - mkdir -p debug_build
+  - cd debug_build
+  - cmake -DCHOBO_PROFILING_SHARED=1 -DCHOBO_PROFILING_BUILD_TESTS=1 -DCMAKE_CXX_COMPILER=$COMPILER .. -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_FLAGS="${ADDITIONAL_CXX_FLAGS}"
+  - make -j2
+  - ctest --output-on-failure
+  - cd ..
+  - mkdir -p release_build
+  - cd release_build
+  - cmake -DCHOBO_PROFILING_SHARED=1 -DCHOBO_PROFILING_BUILD_TESTS=1 -DCMAKE_CXX_COMPILER=$COMPILER .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_FLAGS="${ADDITIONAL_CXX_FLAGS}"
+  - make -j2
+  - ctest --output-on_failure

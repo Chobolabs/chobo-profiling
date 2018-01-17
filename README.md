@@ -1,6 +1,10 @@
 chobo-profiling
 ===============
 
+[![Language](https://img.shields.io/badge/language-C++-blue.svg)](https://isocpp.org/) [![Standard](https://img.shields.io/badge/C%2B%2B-11-blue.svg)](https://en.wikipedia.org/wiki/C%2B%2B#Standardization) [![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://opensource.org/licenses/MIT) [![Gitter](https://badges.gitter.im/iboB/dynamix.svg)](https://gitter.im/iboB/dynamix?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
+
+[![Travis CI](https://travis-ci.org/Chobolabs/chobo-profiling.svg?branch=master)](https://travis-ci.org/Chobolabs/chobo-profiling) [![AppVeyor](https://ci.appveyor.com/api/projects/status/75udf8vkp2m8y5ry?svg=true)](https://ci.appveyor.com/project/iboB/chobo-profiling)
+
 A multi-platform intrusive call graph C++ performance profiling library.
 
 Usage
