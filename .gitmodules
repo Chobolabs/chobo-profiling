@@ -1,0 +1,3 @@
+[submodule "chobo-shl"]
+	path = chobo-shl
+	url = https://github.com/Chobolabs/chobo-shl.git
