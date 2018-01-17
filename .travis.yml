@@ -62,7 +62,7 @@ before_script:
 script:
   # sanitizer options
   - export ASAN_OPTIONS=allow_addr2line=true:check_initialization_order=true:strict_init_order=true:strict_string_checks=true:detect_odr_violation=2:detect_stack_use_after_return=true:verbosity=0
-  - export LSAN_OPTIONS=suppressions=../tools/lsan.supp
+  # - export LSAN_OPTIONS=suppressions=../tools/lsan.supp
   # build tests in debug and release and run them
   - mkdir -p debug_build
   - cd debug_build
